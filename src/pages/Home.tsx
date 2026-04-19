@@ -38,7 +38,7 @@ export default function Home() {
               Instant legal risk assessment for foreign nationals. Covering 22 designated countries, theory exemptions, and penalty thresholds. From £19.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-16">
-              <a href="#checker" className="px-8 py-4 bg-accent text-bg rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-[#F2C475] transition-all uppercase tracking-widest text-sm group">
+              <a href="#checker" className="px-8 py-4 bg-amber text-bg rounded-lg font-bold flex items-center justify-center gap-2 uppercase tracking-widest text-sm group transition-all duration-300 hover:bg-green hover:shadow-[0_0_25px_rgba(34,197,94,0.35)]">
                 Start Free Risk Check <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
