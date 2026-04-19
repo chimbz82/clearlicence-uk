@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { Lock, CheckCircle, AlertTriangle, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { CheckerResult } from '../../types';
 import { Link } from 'react-router-dom';
 
@@ -9,6 +9,27 @@ interface ResultsGateProps {
 }
 
 export default function ResultsGate({ result, onPay }: ResultsGateProps) {
+  const normalizedStatus = result.status.toLowerCase();
+  const isDanger = normalizedStatus.includes('not eligible') || normalizedStatus.includes('ban');
+  const isWarning = normalizedStatus.includes('borderline') || normalizedStatus.includes('warning');
+
+  const statusTone = isDanger
+    ? {
+        container: 'border-warning/20 bg-warning/5',
+        text: 'text-warning',
+      }
+    : isWarning
+      ? {
+          container: 'border-accent/20 bg-accent/5',
+          text: 'text-accent',
+        }
+      : {
+          container: 'border-green/20 bg-green/5',
+          text: 'text-green',
+        };
+
+  const StatusIcon = isDanger ? XCircle : isWarning ? AlertTriangle : CheckCircle;
+
   return (
     <div className="bg-surface rounded-2xl overflow-hidden shadow-2xl border border-border-dim animate-in fade-in zoom-in duration-500">
       <div className="bg-bg border-b border-border-dim p-8 text-center relative overflow-hidden">
@@ -18,10 +39,10 @@ export default function ResultsGate({ result, onPay }: ResultsGateProps) {
       </div>
 
       <div className="p-8 space-y-8">
-        <div className="flex items-start gap-4 p-6 bg-accent/5 rounded-xl border border-accent/20">
-          <CheckCircle2 className="w-8 h-8 text-accent mt-1 shrink-0" />
+        <div className={`flex items-start gap-4 p-6 rounded-xl border ${statusTone.container}`}>
+          <StatusIcon className={`w-8 h-8 mt-1 shrink-0 ${statusTone.text}`} />
           <div>
-            <h3 className="font-bold text-lg text-text-main mb-1 tracking-wide">Status: {result.status}</h3>
+            <h3 className={`font-bold text-lg mb-1 tracking-wide ${statusTone.text}`}>Status: {result.status}</h3>
             <p className="text-text-dim leading-relaxed">{result.summary}</p>
           </div>
         </div>
@@ -58,9 +79,10 @@ export default function ResultsGate({ result, onPay }: ResultsGateProps) {
               <p className="text-text-dim mb-8 text-sm leading-relaxed relative z-10">
                 To view your full risk breakdown, specific blocker details, and legal action plan, please select a report tier.
               </p>
-              <Link 
+              <Link
                 to="/pricing"
-                className="block w-full py-4 bg-accent text-bg rounded-lg font-bold text-[15px] uppercase tracking-[1px] hover:bg-[#F2C475] transition-all flex items-center justify-center gap-2 group relative z-10 shadow-[0_0_20px_rgba(229,180,93,0.2)] hover:shadow-[0_0_30px_rgba(229,180,93,0.4)]"
+                onClick={onPay}
+                className="block w-full py-4 bg-accent text-bg rounded-lg font-bold text-[15px] uppercase tracking-[1px] hover:bg-green transition-all flex items-center justify-center gap-2 group relative z-10 shadow-[0_0_20px_rgba(229,180,93,0.2)] hover:shadow-[0_0_30px_rgba(34,197,94,0.4)]"
               >
                 Unlock My Full Report <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>

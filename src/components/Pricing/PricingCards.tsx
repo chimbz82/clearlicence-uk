@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils';
 
 interface PricingTierProps {
   key?: React.Key;
-  id: 'basic' | 'pro' | 'plus';
+  id: 'basic' | 'pro' | 'pro-plus';
   name: string;
   price: number;
   icon: any;
@@ -17,14 +17,16 @@ function PricingCard({ id, name, price, icon: Icon, features, popular, onSelect 
   return (
     <div className={cn(
       "relative p-8 rounded-2xl border transition-all duration-300 flex flex-col h-full bg-surface group",
-      popular ? "border-accent shadow-[0_0_30px_rgba(229,180,93,0.15)] scale-105 z-10" : "border-border-dim hover:border-text-dim"
+      popular
+        ? "border-accent shadow-[0_0_30px_rgba(229,180,93,0.15)] scale-105 z-10 hover:border-green hover:shadow-[0_0_30px_rgba(34,197,94,0.2)]"
+        : "border-border-dim hover:border-green"
     )}>
       {popular && (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-bg px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[1.5px]">
           Most Popular
         </span>
       )}
-      
+
       <div className={cn(
         "w-14 h-14 rounded-lg flex items-center justify-center mb-6 border",
         popular ? "bg-accent/10 border-accent text-accent" : "bg-bg border-border-dim text-text-dim"
@@ -51,9 +53,9 @@ function PricingCard({ id, name, price, icon: Icon, features, popular, onSelect 
         onClick={() => onSelect(id, name)}
         className={cn(
           "w-full py-4 rounded-lg font-bold transition-all text-[13px] uppercase tracking-[1.5px]",
-          popular 
-            ? "bg-accent text-bg hover:bg-[#F2C475] shadow-[0_0_15px_rgba(229,180,93,0.2)]" 
-            : "bg-transparent border border-border-dim text-text-main hover:border-text-main"
+          popular
+            ? "bg-accent text-bg hover:bg-green shadow-[0_0_15px_rgba(229,180,93,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.35)]"
+            : "bg-transparent border border-border-dim text-text-main hover:border-green hover:text-green"
         )}
       >
         Get {name} →
@@ -79,7 +81,7 @@ const tiers = [
     features: ['Everything in Basic', 'Detailed regulation breakdown', 'Document checklist per country', 'DVLA form filling guide', 'Email support access'],
   },
   {
-    id: 'plus' as const,
+    id: 'pro-plus' as const,
     name: 'Premium Plus',
     price: 69,
     icon: Crown,
@@ -91,15 +93,15 @@ export default function PricingCards({ onSelect }: { onSelect: (id: string, name
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
       {tiers.map((tier) => (
-        <PricingCard 
-          key={tier.id} 
+        <PricingCard
+          key={tier.id}
           id={tier.id}
           name={tier.name}
           price={tier.price}
           icon={tier.icon}
           features={tier.features}
           popular={!!tier.popular}
-          onSelect={onSelect} 
+          onSelect={onSelect}
         />
       ))}
     </div>

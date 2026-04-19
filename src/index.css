@@ -5,10 +5,13 @@
   --color-surface: #141416;
   --color-accent: #E5B45D;
   --color-warning: #FF4B2B;
+  --color-green: #22C55E;
+  --color-success: #22C55E;
   --color-text-main: #FFFFFF;
   --color-text-dim: #999999;
   --color-border-dim: rgba(255, 255, 255, 0.1);
   --color-accent-dim: rgba(229, 180, 93, 0.05);
+  --color-green-dim: rgba(34, 197, 94, 0.08);
 
   --font-serif: "Georgia", ui-serif, serif;
   --font-sans: "Helvetica Neue", Arial, sans-serif;
@@ -20,9 +23,69 @@
     background-color: var(--color-bg);
     color: var(--color-text-main);
   }
+
   body {
     background-color: var(--color-bg);
     color: var(--color-text-main);
     font-family: var(--font-sans);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(229, 180, 93, 0.3) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(229, 180, 93, 0.3);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(34, 197, 94, 0.4);
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus,
+  button:focus-visible {
+    outline: 2px solid rgba(34, 197, 94, 0.45);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes pulse-green {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+}
+
+@layer utilities {
+  .animate-pulse-green {
+    animation: pulse-green 2s infinite;
+  }
+
+  .badge-safe {
+    @apply inline-flex items-center rounded-full border border-green/30 bg-green/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-accent;
+  }
+
+  .badge-danger {
+    @apply inline-flex items-center rounded-full border border-warning/30 bg-warning/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-warning;
   }
 }
