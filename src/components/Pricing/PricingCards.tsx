@@ -52,8 +52,8 @@ function PricingCard({ id, name, price, icon: Icon, features, popular, onSelect 
         className={cn(
           "w-full py-4 rounded-lg font-bold transition-all text-[13px] uppercase tracking-[1.5px]",
           popular 
-            ? "bg-accent text-bg hover:bg-[#F2C475] shadow-[0_0_15px_rgba(229,180,93,0.2)]" 
-            : "bg-transparent border border-border-dim text-text-main hover:border-text-main"
+            ? "bg-amber text-bg hover:bg-green hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] shadow-[0_0_15px_rgba(229,180,93,0.2)]" 
+            : "bg-transparent border border-border-dim text-text-main hover:border-green hover:text-green hover:shadow-[0_0_15px_rgba(34,197,94,0.15)]"
         )}
       >
         Get {name} →
