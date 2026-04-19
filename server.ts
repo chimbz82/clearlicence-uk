@@ -87,20 +87,17 @@ async function startServer() {
     try {
       const { priceId, email, productName, leadId } = req.body;
 
+      // Map tier names to real Stripe Price IDs
+      const PRICE_MAP: Record<string, string> = {
+        basic: 'price_1TNj5RDb7CYzRjW63rMfroyM',
+        pro: 'price_1TNj63Db7CYzRjW6mL7NLg3I',
+        'pro-plus': 'price_1TNj6iDb7CYzRjW6xdiGs4Or',
+      };
+      const stripePriceId = PRICE_MAP[priceId] || priceId;
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
-        line_items: [
-          {
-            price_data: {
-              currency: 'gbp',
-              product_data: {
-                name: productName,
-              },
-              unit_amount: priceId === 'basic' ? 1900 : priceId === 'pro' ? 3900 : 6900,
-            },
-            quantity: 1,
-          },
-        ],
+        line_items: [{ price: stripePriceId, quantity: 1 }],
         mode: 'payment',
         customer_email: email,
         success_url: `${process.env.APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
