@@ -9,7 +9,6 @@ ClearLicence UK is a UK driving licence risk checker for immigrants and foreign 
 - Vite + React + TypeScript frontend deployed at https://clearlicence-uk.vercel.app (commit 5468d28)
 - GitHub repo: https://github.com/chimbz82/clearlicence-uk (branch: main)
 - Vercel project: clearlicence-uk under team simbas-projects-eab09361
-- Gemini/Google AI fully stripped from codebase (commit 5468d28)
 - Traffic light colour system applied: red=#FF4B2B, amber=#E5B45D, green=#22C55E
 - All 4 checker routes built: RouteA_Conversion, RouteB_Points, RouteC_Validity, RouteD_Theory
 - Stripe products created in ClearLicence UK sandbox account (under LIONTECH INNOVATIONS LTD org)
@@ -17,7 +16,7 @@ ClearLicence UK is a UK driving licence risk checker for immigrants and foreign 
 
 ### ❌ Not done yet
 - Supabase SQL schema NOT run yet — tables do not exist
-- Railway backend NOT deployed — server.ts exists locally but no Railway service created
+- Vercel serverless API routes are now the backend — Railway is no longer required
 - Stripe webhook NOT configured — STRIPE_WEBHOOK_SECRET is placeholder
 - Email alerts NOT tested — Zoho SMTP creds not yet entered
 - Domain clearlicence.co.uk NOT purchased yet (deferred until ClearVisa first payout)
@@ -33,11 +32,11 @@ Run the Supabase SQL schema. Go to https://supabase.com → liontechino@gmail.co
 
 - **Decision:** Stripe products in ClearLicence UK sub-account under LIONTECH INNOVATIONS LTD org
   **Reason:** Keeps finances separate per product, same login
-  **Reversibility:** Load-bearing — price IDs are hardcoded in server.ts PRICE_MAP
+  **Reversibility:** Load-bearing — price IDs are hardcoded in api/checkout.ts PRICE_MAP
 
-- **Decision:** Frontend only on Vercel, backend (server.ts) goes on Railway separately
-  **Reason:** Vercel can't run persistent Express servers
-  **Reversibility:** Easy to change
+- **Decision:** Frontend and backend both run on Vercel
+  **Reason:** Express was converted to Vercel serverless API routes, removing the Railway dependency
+  **Reversibility:** Easy to change if a persistent backend becomes necessary
 
 - **Decision:** Using Zoho SMTP (smtp.zoho.eu:465) for payment alert emails
   **Reason:** Already used on other products (ExpatNannies)
@@ -83,9 +82,12 @@ clearlicence-uk/
 │   │       └── DynamicSEOPage.tsx     — Handles all 140+ programmatic SEO routes
 │   ├── index.css                      — Traffic light design system (DO NOT revert colours)
 │   └── App.tsx                        — React Router routes
-├── server.ts                          — Express backend: /api/leads, /api/checkout, /api/webhook
+├── api/
+│   ├── leads.ts                       — POST /api/leads, saves lead to Supabase
+│   ├── checkout.ts                    — POST /api/checkout, creates Stripe Checkout session
+│   └── webhook.ts                     — POST /api/webhook, Stripe fulfillment + payment alert
 ├── supabase-schema.sql                — Run this in Supabase SQL Editor (NOT RUN YET)
-├── vercel.json                        — X-Robots-Tag headers, API rewrites to Railway
+├── vercel.json                        — X-Robots-Tag headers and Vercel API function runtime
 ├── vite.config.ts                     — Vite config
 └── .env.example                       — All placeholder values (real values in Vercel dashboard)
 ```
@@ -95,12 +97,11 @@ clearlicence-uk/
 - **clearlicence.co.uk is TAKEN** — do not try to register it. Use vercel URL until broker deal or alternative domain.
 - **Supabase free tier = 2 active projects max** — liontechino@gmail.com account has 0 projects currently so ClearLicence is the only one. Do not create more projects on that account without pausing ClearLicence first.
 - **Stripe MCP is connected to ExpatNannies (acct_1SliWAFwFeavywBN)** — cannot use Claude's Stripe MCP to manage ClearLicence Stripe account. Must use dashboard directly or pass secret key explicitly.
-- **PRICE_MAP in server.ts** — the checkout handler maps tier strings (basic/pro/pro-plus) to real Stripe price IDs. Do not change these IDs:
+- **PRICE_MAP in api/checkout.ts** — the checkout handler maps tier strings (basic/pro/pro-plus) to real Stripe price IDs. Do not change these IDs:
   - basic: price_1TNj5RDb7CYzRjW63rMfroyM (£19)
   - pro: price_1TNj63Db7CYzRjW6mL7NLg3I (£39)
   - pro-plus: price_1TNj6iDb7CYzRjW6xdiGs4Or (£69)
-- **STRIPE_WEBHOOK_SECRET is placeholder** — Stripe webhook will fail until Railway is deployed and real webhook secret is added
-- **VITE_API_URL is placeholder** — set to https://placeholder.railway.app in Vercel. Must update to real Railway URL after backend deploy
+- **STRIPE_WEBHOOK_SECRET is placeholder** — Stripe webhook will fail until the real Vercel webhook secret is added
 - **GitHub secret scanning** — .env.example was flagged for containing real Supabase service role key. It now has placeholders only. Never commit real secrets.
 - **Vercel env var import** — manual entry threw "invalid characters" error. Always use "Import .env" button with a downloaded .env file instead.
 
@@ -119,19 +120,18 @@ clearlicence-uk/
 
 ## 7. Open Questions
 
-1. What is the Zoho sending email address for ClearLicence? (needed for ZOHO_EMAIL env var on Railway)
-2. What is the Zoho app password? (needed for ZOHO_APP_PASSWORD env var on Railway)
-3. Should Railway backend be deployed under the same Vercel team or standalone? (user preference)
-4. Once domain is purchased — should it be added to Vercel only, or also GoDaddy DNS needs configuring?
+1. What is the Zoho sending email address for ClearLicence? (needed for ZOHO_EMAIL env var on Vercel)
+2. What is the Zoho app password? (needed for ZOHO_APP_PASSWORD env var on Vercel)
+3. Once domain is purchased — should it be added to Vercel only, or also GoDaddy DNS needs configuring?
 
 ## 8. Do Not Touch
 
 - `src/index.css` colour variables — traffic light system is locked, do not revert or rename
-- Stripe price IDs in `server.ts` PRICE_MAP — these are live sandbox products
+- Stripe price IDs in `api/checkout.ts` PRICE_MAP — these are live sandbox products
 - Supabase project ref `bgnsxbbqrxpsgxvexjsz` — do not delete or pause this project
 - `src/lib/engine/` files — DVLA rules logic, do not simplify or mock
 - Vercel project name `clearlicence-uk` — changing it breaks the deployment URL
 
 ## 9. Resume Command
 
-> "Read HANDOFF.md. The Supabase SQL schema has not been run yet — run supabase-schema.sql in the SQL Editor at https://supabase.com (login: liontechino@gmail.com, project: clearlicenceuk). Then set up Railway backend by deploying server.ts as a Node.js service, adding all backend env vars (SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, ZOHO_EMAIL, ZOHO_APP_PASSWORD, ALERT_EMAIL_1, ALERT_EMAIL_2, PORT=3000, APP_URL). Then update VITE_API_URL in Vercel to the Railway URL and redeploy. Do not touch src/index.css colours or Stripe price IDs. Confirm before making changes outside these three tasks."
+> "Read HANDOFF.md. The Supabase SQL schema has not been run yet — run supabase-schema.sql in the SQL Editor at https://supabase.com (login: liontechino@gmail.com, project: clearlicenceuk). Then add all backend env vars to Vercel (SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, ZOHO_EMAIL, ZOHO_APP_PASSWORD, ALERT_EMAIL_1, ALERT_EMAIL_2, APP_URL). Then configure the Stripe webhook URL to https://clearlicence-uk.vercel.app/api/webhook and redeploy. Do not touch src/index.css colours or Stripe price IDs. Confirm before making changes outside these tasks."
